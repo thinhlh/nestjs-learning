@@ -10,20 +10,23 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
   controllers: [AppController],
   imports: [TypeOrmModule.forRoot({
     type: 'postgres',
-    host: 'localhost',
-    port: 5433,
-    username: 'postgres',
-    password: 'postgres',
-    database: 'postgres',
+    host: process.env.DATABASE_HOST,
+    port: +process.env.DATABASE_PORT,
+    username: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME,
     autoLoadEntities: true,
-    synchronize: true, // Should set to false for production
+    synchronize: process.env.STAGE === 'development' ? true : false, // Should set to false for production
   }), BookModule],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(LoggerMiddleware)
-      .forRoutes({ path: "", method: RequestMethod.ALL }, { path: "", method: RequestMethod.GET }) // This is optional. The object passed can be the path with the method.
+      .forRoutes(
+        { path: "", method: RequestMethod.ALL },
+        { path: "", method: RequestMethod.GET }
+      ) // This is optional. The object passed can be the path with the method.
 
   }
 }
